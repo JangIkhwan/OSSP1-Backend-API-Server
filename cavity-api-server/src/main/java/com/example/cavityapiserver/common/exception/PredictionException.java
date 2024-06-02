@@ -4,16 +4,16 @@ import com.example.cavityapiserver.common.response.status.ResponseStatus;
 import lombok.Getter;
 
 @Getter
-public class PredictionRequestException extends RuntimeException {
+public class PredictionException extends RuntimeException {
 
     private final ResponseStatus exceptionStatus;
 
-    public PredictionRequestException(ResponseStatus exceptionStatus) {
+    public PredictionException(ResponseStatus exceptionStatus) {
         super(exceptionStatus.getMessage());
         this.exceptionStatus = exceptionStatus;
     }
 
-    public PredictionRequestException(ResponseStatus exceptionStatus, String message) {
+    public PredictionException(ResponseStatus exceptionStatus, String message) {
         super(message);
         this.exceptionStatus = exceptionStatus;
     }

@@ -1,9 +1,7 @@
 package com.example.cavityapiserver.service;
 
-import com.example.cavityapiserver.common.exception.PredictionRequestException;
+import com.example.cavityapiserver.common.exception.PredictionException;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.tomcat.util.http.fileupload.FileUploadException;
-import org.apache.tomcat.util.http.fileupload.impl.FileUploadIOException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -28,7 +26,7 @@ public class ImageService {
             final File file = new File(imageDir + imageName);
             image.transferTo(file);
         } catch (Exception e) {
-            throw new PredictionRequestException(IMAGE_UPLOAD_FAIL);
+            throw new PredictionException(IMAGE_UPLOAD_FAIL);
         }
         return imageDir + imageName;
     }

@@ -6,10 +6,8 @@ import lombok.*;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString
 @Builder
-public class RequestPostRequest {
+public class PredictionGetRequest {
     private String device_token;
     private Long request_id;
-    private String image_url;
 }
