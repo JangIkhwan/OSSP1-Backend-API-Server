@@ -9,6 +9,6 @@ import lombok.Setter;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class PredictionPostResponse {
-    private Long prediction_request_id;
+public class QueryPostResponse {
+    private Long query_id;
 }

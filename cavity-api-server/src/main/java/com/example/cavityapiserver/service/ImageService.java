@@ -28,6 +28,6 @@ public class ImageService {
         } catch (Exception e) {
             throw new PredictionException(IMAGE_UPLOAD_FAIL);
         }
-        return imageDir + imageName;
+        return imageName;
     }
 }

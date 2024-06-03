@@ -1,15 +1,16 @@
 package com.example.cavityapiserver.dto;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@Setter
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString
-@Builder
 public class PredictionPostRequest {
     private String device_token;
     private Long request_id;
-    private String image_url;
+    private DataDTO data;
 }

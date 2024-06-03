@@ -2,6 +2,7 @@ package com.example.cavityapiserver.dao;
 
 import com.example.cavityapiserver.dto.*;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
@@ -16,18 +17,18 @@ import static java.util.List.of;
 
 @Slf4j
 @Repository
-public class PredictionRequestDAO {
+public class QueryDAO {
     private final NamedParameterJdbcTemplate jdbcTemplate;
 
-    public PredictionRequestDAO(DataSource dataSource){
+    public QueryDAO(DataSource dataSource){
         jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
     }
 
-    public long addRequest(PredictionPostRequest postRequest) {
-        log.info("PredictionRequestDAO::addRequest");
+    public long addQuery(QueryPostRequest postRequest) {
+        log.info("QueryDAO::add");
         log.info("postRequestDTO=" + postRequest.toString());
 
-        String sql = "insert into predictions(device_token, request_id, image_url)" +
+        String sql = "insert into querys(device_token, request_id, image_url)" +
                 " values(:device_token, :request_id, :image_url)";
 
         SqlParameterSource param = new BeanPropertySqlParameterSource(postRequest);
@@ -37,8 +38,8 @@ public class PredictionRequestDAO {
         return Objects.requireNonNull(keyHolder.getKey()).longValue();
     }
 
-    public boolean hasDuplicateRequest(PredictionPostRequest postRequest) {
-        String sql = "SELECT EXISTS(SELECT * FROM predictions" +
+    public boolean hasDuplicateQuery(QueryPostRequest postRequest) {
+        String sql = "SELECT EXISTS(SELECT * FROM querys" +
                 " WHERE device_token = :device_token AND request_id = :request_id)";
 
         Map<String, Object> param = Map.of(
@@ -74,27 +75,34 @@ public class PredictionRequestDAO {
         return jdbcTemplate.queryForObject(sql, param, String.class);
     }
 
-    public boolean requestExists(PredictionPatchRequest patchRequest) {
-        String sql = "SELECT EXISTS(SELECT * FROM predictions" +
-                " WHERE device_token = :device_token AND request_id = :request_id)";
+    public Optional<Long> findQueryId(PredictionPostRequest patchRequest) {
+        log.info("QueryDAO::findQueryId");
+        log.info("patchRequestDTO=" + patchRequest.toString());
+        String sql = "SELECT query_id FROM querys" +
+                " WHERE device_token = :device_token AND request_id = :request_id";
 
         Map<String, Object> param = Map.of(
                 "device_token", patchRequest.getDevice_token(),
                 "request_id", patchRequest.getRequest_id()
         );
 
-        return Boolean.TRUE.equals(jdbcTemplate.queryForObject(sql, param, boolean.class));
-    }
+        try{
+            Long queryId = jdbcTemplate.queryForObject(sql, param, Long.class);
+            return Optional.of(queryId);
+        }
+        catch (EmptyResultDataAccessException e) {
+            return Optional.empty();
+        }
 
-    public int addResult(PredictionPatchRequest patchRequest) {
+}
+
+    public int addResult(PredictionPostRequest patchRequest) {
         String sql = "UPDATE predictions SET object_class = :class, cavity_probability=:prob, status='finished'" +
                 " WHERE request_id = :request_id AND device_token = :device_token";
 
         Map<String, Object> param = Map.of(
                 "device_token", patchRequest.getDevice_token(),
-                "request_id", patchRequest.getRequest_id(),
-                "class", patchRequest.getData().getPred().,
-                "prob", patchRequest.getData().getPred().
+                "request_id", patchRequest.getRequest_id()
         );
 
         return jdbcTemplate.update(sql, param);
@@ -131,5 +139,28 @@ public class PredictionRequestDAO {
             );
             return point;
         });
+    }
+
+    public int modifyStatus_finished(Long queryId) {
+        String sql = "UPDATE querys SET status='finished'" +
+                " WHERE query_id = :query_id";
+
+        Map<String, Object> param = Map.of(
+                "query_id", queryId
+        );
+
+        return jdbcTemplate.update(sql, param);
+    }
+
+    public boolean queryIsfinished(PredictionPostRequest patchRequest) {
+        String sql = "SELECT EXISTS(SELECT * FROM querys " +
+                "WHERE device_token = :device_token AND request_id = :request_id AND status='finished')";
+
+        Map<String, Object> param = Map.of(
+                "device_token", patchRequest.getDevice_token(),
+                "request_id", patchRequest.getRequest_id()
+        );
+
+        return Boolean.TRUE.equals(jdbcTemplate.queryForObject(sql, param, boolean.class));
     }
 }

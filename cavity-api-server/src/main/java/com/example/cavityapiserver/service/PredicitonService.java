@@ -2,16 +2,17 @@ package com.example.cavityapiserver.service;
 
 import com.example.cavityapiserver.common.exception.DatabaseException;
 import com.example.cavityapiserver.common.exception.PredictionException;
-import com.example.cavityapiserver.dao.PredictionRequestDAO;
+import com.example.cavityapiserver.dao.PredictionDAO;
+import com.example.cavityapiserver.dao.QueryDAO;
 import com.example.cavityapiserver.dto.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import static com.example.cavityapiserver.common.response.status.BaseExceptionResponseStatus.*;
 
@@ -20,32 +21,40 @@ import static com.example.cavityapiserver.common.response.status.BaseExceptionRe
 @RequiredArgsConstructor
 public class PredicitonService {
 
-    private final PredictionRequestDAO prDao;
-    private final String imageDir = "/Users/apple/Documents/file/";
-    public long addRequest(PredictionPostRequest postRequest) {
-        if(prDao.hasDuplicateRequest(postRequest)){
-            throw new PredictionException(DUPLICATE_REQUEST);
-        }
-        return prDao.addRequest(postRequest);
-    }
+    private final PredictionDAO predDao;
+
+    private final QueryDAO queryDao;
 
     public PredictionGetResponse getResult(PredictionGetRequest getRequest) {
-        if(!prDao.hasResult(getRequest)){
+        if(!predDao.hasResult(getRequest)){
             throw new PredictionException(RESULT_NOT_FOUND);
         }
-        Prediction result = prDao.getClassAndProbability(getRequest);
-        List<List<Integer>> bboxPoints = prDao.getBboxPoints(getRequest);
-        result.setBbox(bboxPoints);
-        List<Prediction> pred = new ArrayList<>();
-        pred.add(result);
-        return new PredictionGetResponse(pred);
+        List<Prediction> prediction = predDao.getPrediction(getRequest);
+        return new PredictionGetResponse(prediction);
     }
 
-    public void addResult(PredictionPatchRequest patchRequest) {
-        if(!prDao.requestExists(patchRequest)){
-            throw new PredictionException(REQUEST_NOT_FOUND);
+    @Transactional
+    public void addResult(PredictionPostRequest patchRequest) {
+        Optional<Long> optional = queryDao.findQueryId(patchRequest);
+
+        if(optional.isEmpty()){
+            throw new PredictionException(QUERY_NOT_FOUND);
         }
-        int affectedRow = prDao.addResult(patchRequest);
+
+        if(queryDao.queryIsfinished(patchRequest)){
+            throw new PredictionException(QUERY_FINISHED);
+        }
+        //
+
+        List<Prediction> pred = patchRequest.getData().getPred();
+        pred.forEach(prediction -> {
+            int affectedRow = predDao.addResult(patchRequest, optional.get(), prediction);
+            if(affectedRow == -1){
+                throw new DatabaseException(DATABASE_ERROR);
+            }
+        });
+
+        int affectedRow = queryDao.modifyStatus_finished(optional.get());
         if(affectedRow == -1){
             throw new DatabaseException(DATABASE_ERROR);
         }

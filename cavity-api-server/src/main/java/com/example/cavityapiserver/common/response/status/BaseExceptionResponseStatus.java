@@ -27,13 +27,21 @@ public enum BaseExceptionResponseStatus implements ResponseStatus {
 
 
     /**
-     * 4000: Request 오류
+     * 4000: QUERY 오류
      */
 
     IMAGE_UPLOAD_FAIL(4000, HttpStatus.INSUFFICIENT_STORAGE.value(), "서버에 이미지를 업로드하는데 실패했습니다."),
-    DUPLICATE_REQUEST(4001, HttpStatus.BAD_REQUEST.value(), "중복된 요청입니다."),
-    RESULT_NOT_FOUND(4002, HttpStatus.NO_CONTENT.value(), "서버에 아직 결과가 도착하지 않았습니다."),
-    REQUEST_NOT_FOUND(4003, HttpStatus.BAD_REQUEST.value(), "존재하지 않는 요청에 대한 예측결과 입니다.");
+    DUPLICATE_QUERY(4001, HttpStatus.BAD_REQUEST.value(), "중복된 업로드 요청입니다."),
+
+    /**
+     * 5000: PREDICTION 오류
+     */
+
+    RESULT_NOT_FOUND(5001, HttpStatus.BAD_REQUEST.value(), "서버에 아직 결과가 도착하지 않았습니다."),
+    QUERY_NOT_FOUND(5002, HttpStatus.BAD_REQUEST.value(), "존재하지 않는 요청에 대한 예측결과 입니다."),
+    QUERY_FINISHED(5003, HttpStatus.BAD_REQUEST.value(), "이미 결과를 받은 요청입니다.");
+
+
 
     private final int code;
     private final int status;
