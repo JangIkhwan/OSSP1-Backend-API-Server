@@ -39,8 +39,12 @@ public enum BaseExceptionResponseStatus implements ResponseStatus {
 
     RESULT_NOT_FOUND(5001, HttpStatus.BAD_REQUEST.value(), "서버에 아직 결과가 도착하지 않았습니다."),
     QUERY_NOT_FOUND(5002, HttpStatus.BAD_REQUEST.value(), "존재하지 않는 요청에 대한 예측결과 입니다."),
-    QUERY_FINISHED(5003, HttpStatus.BAD_REQUEST.value(), "이미 결과를 받은 요청입니다.");
+    QUERY_FINISHED(5003, HttpStatus.BAD_REQUEST.value(), "이미 결과를 받은 요청입니다."),
 
+    /*
+    6000: WEB CLIENT 오류
+     */
+    WEB_CLIENT_ERROR(6001, HttpStatus.NOT_ACCEPTABLE.value(), "모델 서버에 요청을 보내는데 실패했습니다.");
 
 
     private final int code;

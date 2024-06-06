@@ -34,21 +34,20 @@ public class PredicitonService {
     }
 
     @Transactional
-    public void addResult(PredictionPostRequest patchRequest) {
-        Optional<Long> optional = queryDao.findQueryId(patchRequest);
+    public void addResult(PredictionPostRequest postRequest) {
+        Optional<Long> optional = queryDao.findQueryId(postRequest);
 
         if(optional.isEmpty()){
             throw new PredictionException(QUERY_NOT_FOUND);
         }
 
-        if(queryDao.queryIsfinished(patchRequest)){
+        if(queryDao.queryIsfinished(postRequest)){
             throw new PredictionException(QUERY_FINISHED);
         }
-        //
 
-        List<Prediction> pred = patchRequest.getData().getPred();
+        List<Prediction> pred = postRequest.getData().getPred();
         pred.forEach(prediction -> {
-            int affectedRow = predDao.addResult(patchRequest, optional.get(), prediction);
+            int affectedRow = predDao.addResult(postRequest, optional.get(), prediction);
             if(affectedRow == -1){
                 throw new DatabaseException(DATABASE_ERROR);
             }
