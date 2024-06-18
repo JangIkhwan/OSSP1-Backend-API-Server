@@ -5,6 +5,17 @@ spring:
       "local": "localDB, devPort, web-mvc"
       "dev": "devDB, devPort, web-mvc"
       "prod": "prodDB, prodPort, web-mvc"
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 100MB
+      max-request-size: 150MB
+
+images:
+  path: ${UPLOADED_IMAGE_PATH}
+
+webclient:
+  url: ${WEBCLIENT_BASE_URL}
 
 ---
 

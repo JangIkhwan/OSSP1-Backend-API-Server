@@ -1,24 +1,24 @@
 package com.example.cavityapiserver.service;
 
-import com.example.cavityapiserver.common.exception.PredictionRequestException;
+import com.example.cavityapiserver.common.exception.PredictionException;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.tomcat.util.http.fileupload.FileUploadException;
-import org.apache.tomcat.util.http.fileupload.impl.FileUploadIOException;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.util.UUID;
 
-import static com.example.cavityapiserver.common.response.status.BaseExceptionResponseStatus.IMAGE_UPLOAD_FAIL;
+import static com.example.cavityapiserver.common.response.status.BaseExceptionResponseStatus.IMAGE_UPLOAD_FAILED;
 
 @Slf4j
 @Service
 public class ImageService {
-    private final String imageDir = "/Users/apple/Documents/file/";
+    @Value("${images.path}")
+    private String imageDir;
 
     public String uploadImage(MultipartFile image) {
-        log.info("ImageService::uploadImage");
+        log.info("ImageService::uploadImage()");
         final String extension = image.getContentType().split("/")[1];
         final String imageName = UUID.randomUUID() + "." + extension;
 
@@ -28,8 +28,8 @@ public class ImageService {
             final File file = new File(imageDir + imageName);
             image.transferTo(file);
         } catch (Exception e) {
-            throw new PredictionRequestException(IMAGE_UPLOAD_FAIL);
+            throw new PredictionException(IMAGE_UPLOAD_FAILED);
         }
-        return imageDir + imageName;
+        return imageName;
     }
 }
