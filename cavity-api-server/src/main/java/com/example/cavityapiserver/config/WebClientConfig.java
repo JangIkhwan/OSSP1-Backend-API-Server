@@ -11,6 +11,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.netty.http.client.HttpClient;
+import reactor.netty.resources.ConnectionProvider;
 
 import java.time.Duration;
 import java.util.concurrent.TimeUnit;
@@ -24,12 +25,15 @@ public class WebClientConfig {
 	@Bean
 	public WebClient webClient(WebClient.Builder builder) {
 
-		HttpClient httpClient = HttpClient.create()
-				.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 5000)
-				.responseTimeout(Duration.ofMillis(5000))
-				.doOnConnected(conn ->
-						conn.addHandlerLast(new ReadTimeoutHandler(10000, TimeUnit.MILLISECONDS))
-								.addHandlerLast(new WriteTimeoutHandler(10000, TimeUnit.MILLISECONDS)));
+//		HttpClient httpClient = HttpClient.create()
+//				.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 20000)
+//				.responseTimeout(Duration.ofMillis(20000))
+//				.doOnConnected(conn ->
+//						conn.addHandlerLast(new ReadTimeoutHandler(20000, TimeUnit.MILLISECONDS))
+//								.addHandlerLast(new WriteTimeoutHandler(20000, TimeUnit.MILLISECONDS)));
+
+		HttpClient httpClient = HttpClient.create(ConnectionProvider.newConnection())
+				.responseTimeout(Duration.ofMillis(Long.MAX_VALUE)); // 타임아웃을 무한대로 설정
 
 		return builder
 			.baseUrl(BASE_URL) // 호출할 API 서비스 도메인 URL
