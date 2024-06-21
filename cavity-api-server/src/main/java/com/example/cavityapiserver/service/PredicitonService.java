@@ -25,6 +25,9 @@ public class PredicitonService {
 
     private final QueryDAO queryDao;
 
+    /*
+    데이터베이스에 저장된 판별 결과를 불러오는 메소드
+     */
     public PredictionGetResponse getResult(PredictionGetRequest getRequest) {
         log.info("PredicitonService::getResult()");
         if(!predDao.hasResult(getRequest)){
@@ -34,6 +37,9 @@ public class PredicitonService {
         return new PredictionGetResponse(prediction);
     }
 
+    /*
+    데이터베이스에 모델의 판별 결과를 저장하는 메소드
+     */
     @Transactional
     public void addResult(PredictionResponse response) {
         log.info("PredicitonService::addResult()");

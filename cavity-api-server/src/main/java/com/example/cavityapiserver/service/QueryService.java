@@ -15,6 +15,10 @@ import static com.example.cavityapiserver.common.response.status.BaseExceptionRe
 public class QueryService {
 
     private final QueryDAO queryDao;
+
+    /*
+    앱의 요청을 저장하는 메소드
+     */
     public long addQuery(QueryPostRequest postRequest) {
         log.info("QueryService::addQuery()");
         if(queryDao.hasDuplicateQuery(postRequest)){

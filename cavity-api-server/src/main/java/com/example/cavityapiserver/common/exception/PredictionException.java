@@ -3,6 +3,9 @@ package com.example.cavityapiserver.common.exception;
 import com.example.cavityapiserver.common.response.status.ResponseStatus;
 import lombok.Getter;
 
+/*
+ 충치 판별 관련 예외
+ */
 @Getter
 public class PredictionException extends RuntimeException {
 

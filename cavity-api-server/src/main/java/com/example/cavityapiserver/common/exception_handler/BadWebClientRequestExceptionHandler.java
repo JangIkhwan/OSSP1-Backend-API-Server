@@ -12,6 +12,9 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+/*
+ webclient 호출 예외 핸들러
+ */
 @Slf4j
 @Priority(0)
 @RestControllerAdvice

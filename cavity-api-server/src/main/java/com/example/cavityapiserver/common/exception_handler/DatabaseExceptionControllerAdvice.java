@@ -13,7 +13,9 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import static com.example.cavityapiserver.common.response.status.BaseExceptionResponseStatus.BAD_SQL_GRAMMAR;
 import static com.example.cavityapiserver.common.response.status.BaseExceptionResponseStatus.DATABASE_ERROR;
 
-
+/*
+데이터베이스 예외 핸들러
+ */
 @Slf4j
 @Priority(0)
 @RestControllerAdvice

@@ -15,7 +15,9 @@ import org.springframework.web.servlet.NoHandlerFoundException;
 
 import static com.example.cavityapiserver.common.response.status.BaseExceptionResponseStatus.*;
 
-
+/*
+서버 내부 오류 예외 핸들러
+ */
 @Slf4j
 @RestControllerAdvice
 public class BaseExceptionControllerAdvice {

@@ -28,14 +28,18 @@ public class ServerCallService {
     private final WebClient webClient;
 
     @Value("${images.path}")
-    private String imageDir;
+    private String imageDir; // 앱으로부터 업로드된 사진이 저장된 디렉토리
 
+    /*
+    모델 서버에 충치 판별 요청을 보내는 메소드
+     */
     public Prediction[] postCall(String image_file_name) {
         log.info("ServerCallService::postCall()");
         String url = "/predict";
 
         MultipartBodyBuilder multipartBodyBuilder = new MultipartBodyBuilder();
 
+        // 모델 서버에 보낼 사진 찾기
         try {
             InputStreamResource inputStreamResource = new InputStreamResource(new FileInputStream(imageDir + image_file_name));
             multipartBodyBuilder.part("file", inputStreamResource).filename(image_file_name);
@@ -44,6 +48,7 @@ public class ServerCallService {
             throw new BadWebClientRequestException(WEB_CLIENT_ERROR);
         }
 
+        // 모델 서버에 post 요청
         Mono<Prediction[]> response = webClient
                 .post()
                 .uri(url)

@@ -11,12 +11,16 @@ import java.util.UUID;
 
 import static com.example.cavityapiserver.common.response.status.BaseExceptionResponseStatus.IMAGE_UPLOAD_FAILED;
 
+
 @Slf4j
 @Service
 public class ImageService {
     @Value("${images.path}")
     private String imageDir;
 
+    /*
+    앱의 요청으로 전달받은 이미지를 서버에 저장하는 메소드
+     */
     public String uploadImage(MultipartFile image) {
         log.info("ImageService::uploadImage()");
         final String extension = image.getContentType().split("/")[1];

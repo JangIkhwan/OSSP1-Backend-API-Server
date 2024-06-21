@@ -15,6 +15,9 @@ import java.util.*;
 
 import static java.util.List.of;
 
+/*
+querys 테이블에 관련 데이터접근객체
+ */
 @Slf4j
 @Repository
 public class QueryDAO {
@@ -24,9 +27,11 @@ public class QueryDAO {
         jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
     }
 
+    /*
+    앱의 요청을 querys 테이블에 저장
+     */
     public long addQuery(QueryPostRequest postRequest) {
         log.info("QueryDAO::addQuery");
-//        log.info("postRequestDTO=" + postRequest.toString());
 
         String sql = "insert into querys(device_token, request_id, image_url)" +
                 " values(:device_token, :request_id, :image_url)";
@@ -38,6 +43,9 @@ public class QueryDAO {
         return Objects.requireNonNull(keyHolder.getKey()).longValue();
     }
 
+    /*
+    중복된 요청이 존재하는지 확인
+     */
     public boolean hasDuplicateQuery(QueryPostRequest postRequest) {
         String sql = "SELECT EXISTS(SELECT * FROM querys" +
                 " WHERE device_token = :device_token AND request_id = :request_id)";
@@ -51,30 +59,9 @@ public class QueryDAO {
 
     }
 
-    public boolean hasResult(PredictionGetRequest getRequest) {
-        String sql = "SELECT EXISTS(SELECT * FROM predictions " +
-                "WHERE device_token = :device_token AND request_id = :request_id AND status='finished')";
-
-        Map<String, Object> param = Map.of(
-                "device_token", getRequest.getDevice_token(),
-                "request_id", getRequest.getRequest_id()
-        );
-
-        return Boolean.TRUE.equals(jdbcTemplate.queryForObject(sql, param, boolean.class));
-    }
-
-    public String getResultUrl(PredictionGetRequest getRequest) {
-        String sql = "SELECT result_url FROM predictions " +
-                "WHERE device_token = :device_token AND request_id = :request_id AND status='finished' LIMIT 1";
-
-        Map<String, Object> param = Map.of(
-                "device_token", getRequest.getDevice_token(),
-                "request_id", getRequest.getRequest_id()
-        );
-
-        return jdbcTemplate.queryForObject(sql, param, String.class);
-    }
-
+    /*
+    쿼리id에 해당하는 쿼리를 반환
+     */
     public Optional<Long> findQueryId(PredictionResponse patchRequest) {
         log.info("QueryDAO::findQueryId");
         log.info("patchRequestDTO=" + patchRequest.toString());
@@ -94,53 +81,11 @@ public class QueryDAO {
             return Optional.empty();
         }
 
-}
-
-    public int addResult(PredictionResponse patchRequest) {
-        String sql = "UPDATE predictions SET object_class = :class, cavity_probability=:prob, status='finished'" +
-                " WHERE request_id = :request_id AND device_token = :device_token";
-
-        Map<String, Object> param = Map.of(
-                "device_token", patchRequest.getDevice_token(),
-                "request_id", patchRequest.getRequest_id()
-        );
-
-        return jdbcTemplate.update(sql, param);
-
     }
 
-    public Prediction getClassAndProbability(PredictionGetRequest getRequest) {
-        String sql = "SELECT object_class, cavity_probability FROM predictions " +
-                "WHERE device_token = :device_token AND request_id = :request_id AND status='finished' LIMIT 1";
-
-        Map<String, Object> param = Map.of(
-                "device_token", getRequest.getDevice_token(),
-                "request_id", getRequest.getRequest_id()
-        );
-
-        return jdbcTemplate.queryForObject(sql, param, Prediction.class);
-    }
-
-    public List<List<Integer>> getBboxPoints(PredictionGetRequest getRequest) {
-        String sql = "SELECT b.x, b.y FROM bbox_points as b, predictions as p " +
-                "WHERE b.prediction_id = p.prediction_id AND p.device_token = :device_token AND p.request_id = :request_id";
-
-        Map<String, Object> param = Map.of(
-                "device_token", getRequest.getDevice_token(),
-                "request_id", getRequest.getRequest_id()
-        );
-
-        return jdbcTemplate.query(sql, param, (rs, rowNum)->{
-            List<Integer> point = new ArrayList<>(
-                    Arrays.asList(
-                            Integer.parseInt(rs.getString("b.x")),
-                            Integer.parseInt(rs.getString("b.x"))
-                    )
-            );
-            return point;
-        });
-    }
-
+    /*
+    해당 요청이 처리된 상태로 변경
+     */
     public int modifyStatus_finished(Long queryId) {
         String sql = "UPDATE querys SET status='finished'" +
                 " WHERE query_id = :query_id";
@@ -152,6 +97,9 @@ public class QueryDAO {
         return jdbcTemplate.update(sql, param);
     }
 
+    /*
+    해당 요청이 처리된 상태인지 여부를 반환
+     */
     public boolean queryIsfinished(PredictionResponse patchRequest) {
         String sql = "SELECT EXISTS(SELECT * FROM querys " +
                 "WHERE device_token = :device_token AND request_id = :request_id AND status='finished')";

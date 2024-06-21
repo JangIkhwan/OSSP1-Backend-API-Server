@@ -10,7 +10,9 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 
-
+/*
+컨트롤러 예외 핸들러
+ */
 @Slf4j
 @Priority(0)
 @RestControllerAdvice

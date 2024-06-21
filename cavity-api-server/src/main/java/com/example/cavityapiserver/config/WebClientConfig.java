@@ -19,19 +19,11 @@ import java.util.concurrent.TimeUnit;
 @Configuration
 public class WebClientConfig {
 	@Value("${WEBCLIENT_BASE_URL}")
-	private String BASE_URL;
+	private String BASE_URL;  // 호출할 서버의 url의 prefix
 
     // webClient Bean 등록
 	@Bean
 	public WebClient webClient(WebClient.Builder builder) {
-
-//		HttpClient httpClient = HttpClient.create()
-//				.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 20000)
-//				.responseTimeout(Duration.ofMillis(20000))
-//				.doOnConnected(conn ->
-//						conn.addHandlerLast(new ReadTimeoutHandler(20000, TimeUnit.MILLISECONDS))
-//								.addHandlerLast(new WriteTimeoutHandler(20000, TimeUnit.MILLISECONDS)));
-
 		HttpClient httpClient = HttpClient.create(ConnectionProvider.newConnection())
 				.responseTimeout(Duration.ofMillis(Long.MAX_VALUE)); // 타임아웃을 무한대로 설정
 
@@ -40,7 +32,7 @@ public class WebClientConfig {
 			.clientConnector(new ReactorClientHttpConnector(httpClient)) // 타임 아웃 설정
 			.defaultHeaders(httpHeaders -> {
 				httpHeaders.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
-			})
+			})   // http 메시지 바디에 json 형식의 데이터 저장
 			.build();
 	}
 

@@ -3,6 +3,9 @@ package com.example.cavityapiserver.common.exception;
 import com.example.cavityapiserver.common.response.status.ResponseStatus;
 import lombok.Getter;
 
+/*
+webclient 예외
+ */
 @Getter
 public class BadWebClientRequestException extends RuntimeException {
 

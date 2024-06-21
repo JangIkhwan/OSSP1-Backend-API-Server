@@ -8,7 +8,9 @@ import lombok.Getter;
 
 import static com.example.cavityapiserver.common.response.status.BaseExceptionResponseStatus.SUCCESS;
 
-
+/*
+ 요청이 정상적으로 수행될 경우 응답 내용을 반환하기 위해 사용하는 클래스
+ */
 @Getter
 @JsonPropertyOrder({"code", "status", "message", "result"})
 public class BaseResponse<T> implements ResponseStatus {
