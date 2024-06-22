@@ -21,9 +21,9 @@ public class QueryService {
      */
     public long addQuery(QueryPostRequest postRequest) {
         log.info("QueryService::addQuery()");
-        if(queryDao.hasDuplicateQuery(postRequest)){
+        if(queryDao.hasDuplicateQuery(postRequest)){ // 중복되는 요청이 있는지 확인
             throw new PredictionException(DUPLICATE_QUERY);
         }
-        return queryDao.addQuery(postRequest);
+        return queryDao.addQuery(postRequest); // 요청을 저장
     }
 }

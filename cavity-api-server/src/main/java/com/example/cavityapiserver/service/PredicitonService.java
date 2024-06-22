@@ -30,10 +30,12 @@ public class PredicitonService {
      */
     public PredictionGetResponse getResult(PredictionGetRequest getRequest) {
         log.info("PredicitonService::getResult()");
-        if(!predDao.hasResult(getRequest)){
+
+        if(!predDao.hasResult(getRequest)){ // 결과가 있는지 확인
             throw new PredictionException(RESULT_NOT_FOUND);
         }
-        List<Prediction> prediction = predDao.getPrediction(getRequest);
+
+        List<Prediction> prediction = predDao.getPrediction(getRequest); // 결과를 가져옴
         return new PredictionGetResponse(prediction);
     }
 
@@ -43,17 +45,17 @@ public class PredicitonService {
     @Transactional
     public void addResult(PredictionResponse response) {
         log.info("PredicitonService::addResult()");
-        Optional<Long> optional = queryDao.findQueryId(response);
 
-        if(optional.isEmpty()){
+        Optional<Long> optional = queryDao.findQueryId(response);
+        if(optional.isEmpty()){   // 데이터베이스에 해당 요청이 있었는지 확인
             throw new PredictionException(QUERY_NOT_FOUND);
         }
 
-        if(queryDao.queryIsfinished(response)){
+        if(queryDao.queryIsfinished(response)){ // 해당 요청에 대한 결과가 이미 도착했는지 확인
             throw new PredictionException(QUERY_FINISHED);
         }
 
-        List<Prediction> pred = response.getData().getPred();
+        List<Prediction> pred = response.getData().getPred(); // 모델로부터 전달받은 치아별 판별 결과를 저장
         pred.forEach(prediction -> {
             int affectedRow = predDao.addResult(response, optional.get(), prediction);
             if(affectedRow == -1){
@@ -61,7 +63,7 @@ public class PredicitonService {
             }
         });
 
-        int affectedRow = queryDao.modifyStatus_finished(optional.get());
+        int affectedRow = queryDao.modifyStatus_finished(optional.get()); // 요청의 상태를 모델로부터 결과 도착으로 변경
         if(affectedRow == -1){
             throw new DatabaseException(DATABASE_ERROR);
         }
